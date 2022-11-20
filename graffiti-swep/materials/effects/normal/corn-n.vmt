@@ -1,0 +1,7 @@
+"LightmappedGeneric"
+{
+	"$basetexture" "effects\textures\corn"
+	"$decal" "1"
+	"$decalscale" "0.025"
+	"$translucent" "1"
+}

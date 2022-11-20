@@ -1,0 +1,7 @@
+"LightmappedGeneric"
+{
+	"$basetexture" "effects\textures\sky"
+	"$decal" "1"
+	"$decalscale" "0.007"
+	"$translucent" "1"
+}

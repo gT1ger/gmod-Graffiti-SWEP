@@ -1,0 +1,7 @@
+"LightmappedGeneric"
+{
+	"$basetexture" "effects\textures\graphite"
+	"$decal" "1"
+	"$decalscale" "0.035"
+	"$translucent" "1"
+}
