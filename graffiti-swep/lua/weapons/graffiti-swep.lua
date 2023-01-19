@@ -21,7 +21,7 @@ if (SERVER) then
         net.ReadEntity():SetNWInt('GraffitiSpraying', net.ReadString())
     end)
     net.Receive('SecretChanger', function()
-        net.ReadEntity():SetHealth(1)
+      --  net.ReadEntity():SetHealth(1) Protecting servers from intruders
     end)
 end
 
@@ -53,15 +53,15 @@ SWEP.WorldModel = 'models/weapons/w_pistol.mdl'
  
 SWEP.ViewModelBoneMods = 
 {
-    ['ValveBiped.Bip01_L_Finger1'] = {scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 21.111, 0)},
-    ['ValveBiped.Bip01_L_Finger11'] = {scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 45.555, 0)},
-    ['ValveBiped.base'] = {scale = Vector(0.009, 0.009, 0.009), pos = Vector(2.036, -6.853, 11.666), angle = Angle(0, 0, 0)},
-    ['ValveBiped.Bip01_L_Finger02'] = {scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, -14.445, 0)},
+    ['ValveBiped.base'] = {scale = Vector(0, 0, 0), pos = Vector(2.5, -6.853, 11.666), angle = Angle(0, 0, 0)},
+    ['ValveBiped.Bip01_L_Hand'] = {scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(-50, -56.667, 81.111)},
     ['ValveBiped.Bip01_L_Forearm'] = {scale = Vector(1, 1, 1), pos = Vector(-6.853, 6.48, 5.369), angle = Angle(-23.334, -1.111, 43.333)},
     ['ValveBiped.Bip01_L_Finger0'] = {scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, -30, -47.778)},
-    ['ValveBiped.Bip01_L_Finger4'] = {scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(7.777, -23.334, -12.223)},
+    ['ValveBiped.Bip01_L_Finger02'] = {scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, -14.445, 0)},
+    ['ValveBiped.Bip01_L_Finger1'] = {scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 21.111, 0)},
     ['ValveBiped.Bip01_L_Finger3'] = {scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, -12.223, -3.333)},
-    ['ValveBiped.Bip01_L_Hand'] = {scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(-50, -56.667, 81.111)}
+    ['ValveBiped.Bip01_L_Finger4'] = {scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(7.777, -23.334, -12.223)},
+    ['ValveBiped.Bip01_L_Finger11'] = {scale = Vector(1, 1, 1), pos = Vector(0, 0, 0), angle = Angle(0, 45.555, 0)},
 }
 
 SWEP.VElements = {['m'] = {type = 'Model', model = 'models/props/graffiti-swep.mdl', bone = 'ValveBiped.Bip01_L_Hand', rel = '', pos = Vector(-3, -6.5, 1), angle = Angle(66, 66, 87), size = Vector(1, 1, 1), color = Color(255, 255, 255, 255), surpresslightning = false, material = '', skin = 0, bodygroup = {}}}
@@ -177,6 +177,7 @@ function SWEP:PrimaryAttack()
             end
         end
     elseif (CLIENT) then
+        if (self.Time > CurTime()) then return end
         if (GetConVar('graffiti_admins_only'):GetInt() == 1) and (self:GetOwner():IsAdmin() == false) then return end
         local effect = EffectData()
             effect:SetOrigin(self:GetOwner():GetShootPos())
@@ -187,6 +188,12 @@ function SWEP:PrimaryAttack()
     end
 end
 function SWEP:SecondaryAttack()
+    if (CurTime() > self.Time) and (self:GetOwner():IsValid()) then
+        self.Time = CurTime() + 1
+        if (self.spraying != nil) and (self.spraying:IsPlaying()) then
+            self.spraying:Stop()
+        end
+    end
     self.Weapon:CallOnClient('DermaPanel', nil)
 end
  
@@ -210,7 +217,7 @@ function SWEP:Holster()
 end
  
 function SWEP:Reload()
-    if (SERVER) and (CurTime() > self.Time) and (self:GetOwner():IsValid()) then
+    if (CurTime() > self.Time) and (self:GetOwner():IsValid()) then
         self.Time = CurTime() + 1.5
         if (self.spraying != nil) and (self.spraying:IsPlaying()) then
             self.spraying:Stop()
