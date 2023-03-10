@@ -1,0 +1,6 @@
+"VertexLitGeneric"
+{
+     "$basetexture" "models\props\graffiti-swep\box-3"
+     "$envmapcontrast" 1
+     "$model" 1
+}
