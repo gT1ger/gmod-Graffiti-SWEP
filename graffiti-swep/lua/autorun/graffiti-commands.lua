@@ -1,43 +1,40 @@
 CreateConVar('graffiti_admins_only', 0, FCVAR_NONE, nil, 0, 1)
-CreateConVar('graffiti_max_distance', 140, FCVAR_NONE, nil, 100, 100000)
+CreateConVar('graffiti_can_sounds', 1, FCVAR_NONE, nil, 0, 1)
+CreateConVar('graffiti_can_particle', 1, FCVAR_NONE, nil, 0, 1)
+CreateConVar('graffiti_explosion', 0, FCVAR_NONE, nil, 0, 1)
+CreateConVar('graffiti_max_distance', 140, FCVAR_NONE, nil, 140, 100000)
 
 concommand.Add('graffiti_clear', function(ply, cmd, args)
     if (SERVER) and (ply:IsAdmin()) and (ply:IsValid()) then
-        Entity(0):RemoveAllDecals()
-    end
-end)
-concommand.Add('graffiti_clear', function(ply, cmd, args)
-    if (SERVER) and (ply:IsAdmin()) and (ply:IsValid()) then
-        Entity(0):RemoveAllDecals()
+        for i, ply in ipairs(player.GetAll()) do
+            ply:ConCommand('r_cleardecals')
+        end
     end
 end)
 
 concommand.Add('graffiti_delete_settings', function(ply, cmd, args)
     if (ply:IsValid()) then
-        if (tostring(file.Find('graffiti_settings.txt', 'DATA')[1]) == 'graffiti_settings.txt') then
-            file.Delete('graffiti_settings.txt')
-            print('[graffiti-swep] Settings deleted!')
+        if (tostring(file.Find('graffiti-swep/graffiti-settings.txt', 'DATA')[1]) == 'graffiti-settings.txt') then
+            file.Delete('graffiti-swep/graffiti-settings.txt')
         end
+        if (tostring(file.Find('graffiti-swep/graffiti-settings-client.txt', 'DATA')[1]) == 'graffiti-settings-client.txt') then
+            file.Delete('graffiti-swep/graffiti-settings-client.txt')
+        end
+        if (ply:IsSuperAdmin()) and (tostring(file.Find('graffiti-swep/graffiti-settings-server.txt', 'DATA')[1]) == 'graffiti-settings-server.txt') then
+            file.Delete('graffiti-swep/graffiti-settings-server.txt')
+        end
+        print('[graffiti-swep] Settings deleted!')
     end
 end)
 
-local last_change_admins = 0
-local last_change_distance = 0
-cvars.AddChangeCallback('graffiti_admins_only', function(convar_name, value_old, value_new)
-    if (last_change_admins > CurTime()) then return end
-    last_change_distance = CurTime() + 3
-    if (CLIENT) and (LocalPlayer():IsAdmin() == false) and (value_old != value_new) then
-        RunConsoleCommand('graffiti_admins_only', value_old)
-        return
+cvars.AddChangeCallback('graffiti_can_particle', function(convar_name, value_old, value_new)
+    if (game.SinglePlayer() == false) then
+        for i, ply in ipairs(player.GetAll()) do
+            if (value_new == '1.00') then
+                ply:SendLua('LocalPlayer():SetNWBool("GraffitiCanParticle", true)')
+            elseif (value_new == '0.00') then
+                ply:SendLua('LocalPlayer():SetNWBool("GraffitiCanParticle", false)')
+            end
+        end
     end
-    print('[graffiti-swep] Admins Only: ' .. GetConVar('graffiti_admins_only'):GetInt())
-end)
-cvars.AddChangeCallback('graffiti_max_distance', function(convar_name, value_old, value_new)
-    if (last_change_distance > CurTime()) then return end
-    last_change_distance = CurTime() + 3
-    if (CLIENT) and (LocalPlayer():IsAdmin() == false) and (value_old != value_new) then
-        RunConsoleCommand('graffiti_max_distance', value_old)
-        return
-    end
-    print('[graffiti-swep] Max Distance: ' .. GetConVar('graffiti_max_distance'):GetInt())
 end)
