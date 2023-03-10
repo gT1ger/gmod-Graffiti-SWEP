@@ -1,7 +1,0 @@
-"VertexLitGeneric"
-{
-     "$basetexture" "models\props\graffiti-swep\Sticcker_Box"
-     "$envmap" "env_cubemap"
-     "$envmapcontrast" 1
-     "$model" 1
-}
